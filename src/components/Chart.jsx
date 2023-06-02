@@ -16,7 +16,7 @@ function Chart({ data }) {
     const minTemp = data.baseTemperature + Math.min.apply(null, variance);
     const maxTemp = data.baseTemperature + Math.max.apply(null, variance);
 
-    const tooltip = d3.select("#tooltip");
+    const tooltip = d3.select("#tooltip").style("visibility", "hidden");
 
     const svg = d3.select(chartRef.current);
 
