@@ -18,8 +18,8 @@ function App() {
   }, []);
 
   return (
-    <main className="w-screen h-screen max-w-screen max-h-screen px-20 py-8 grid grid-place-content-center">
-      <section className="w-full h-full flex flex-col justify-between items-center gap-4">
+    <main className="w-screen h-screen max-w-screen max-h-screen py-8 grid grid-place-content-center">
+      <section className="w-full h-full flex flex-col justify-between items-center gap-4 relative">
         <div className="w-full text-center">
           <h1 id="title" className="text-3xl font-medium">
             Monthly Global Land Surface Temperature
@@ -28,7 +28,10 @@ function App() {
             1753 - 2015: Base Temperature 8.66℃
           </p>
         </div>
-        <div className="absolute hidden" />
+        <div
+          id="tooltip"
+          className="absolute w-auto h-auto flex flex-col gap-1 bg-neutral-950/70 backdrop-blur-sm text-white text-sm px-6 py-4 rounded-md"
+        />
         {dataset ? <Chart data={dataset} /> : null}
       </section>
     </main>

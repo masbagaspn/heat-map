@@ -8,7 +8,7 @@ function Chart({ data }) {
   const chartRef = useRef();
 
   useEffect(() => {
-    const width = window.innerWidth * 0.9;
+    const width = window.innerWidth * 0.98;
     const height = window.innerHeight * 0.8;
     const chartPadding = { top: 40, right: 40, bottom: 120, left: 80 };
 
@@ -80,15 +80,12 @@ function Chart({ data }) {
       .attr("width", (d) =>
         d[0] && d[1] ? legendX(d[1]) - legendX(d[0]) : legendX(null)
       )
-      .attr("height", 5)
+      .attr("height", 20)
       .style("fill", (d) => legendThreshold(d[0]))
       .attr("x", (d) => legendX(d[0]))
       .attr("y", 0);
 
-    legend
-      .append("g")
-      .attr("transform", `translate(0, ${5})`)
-      .call(legendXAxis);
+    legend.append("g").attr("transform", `translate(0, 20)`).call(legendXAxis);
 
     const x = d3
       .scaleBand()
@@ -146,6 +143,7 @@ function Chart({ data }) {
         (exit) => exit.remove()
       )
       .classed("cell", true)
+      .attr("id", (d, id) => `rect$-${id}`)
       .attr("data-year", (d) => d.year)
       .attr("data-month", (d) => d.month - 1)
       .attr("data-temp", (d) => data.baseTemperature + d.variance)
@@ -153,9 +151,40 @@ function Chart({ data }) {
       .attr("y", (d) => y(d.month))
       .attr("width", (d) => x.bandwidth(d.year))
       .attr("height", (d) => y.bandwidth(d.month))
-      .attr("fill", (d) => legendThreshold(data.baseTemperature + d.variance));
+      .attr("fill", (d) => legendThreshold(data.baseTemperature + d.variance))
+      .on("mouseover", (e, d) => {
+        const element = document.getElementById(e.target.id);
+        element.style.opacity = 0.4;
+
+        const date = new Date(d.year, d.month);
+
+        tooltip.transition().duration(200).style("visibility", "visible");
+        tooltip
+          .html(
+            `
+                <span>${d3.utcFormat("%Y - %B")(date)}</span>
+                <span>
+                    ${d3.format(".1f")(data.baseTemperature + d.variance)}°C
+                </span>
+                <span>
+                    <b>
+                        ${d3.format("+.1f")(d.variance)}°C
+                    </b>
+                </span>
+            `
+          )
+          .attr("data-year", d.year)
+          .style("left", `${e.clientX + chartPadding.right}px`)
+          .style("top", `${e.clientY - chartPadding.top}px`);
+      })
+      .on("mouseout", (e) => {
+        const element = document.getElementById(e.target.id);
+        element.style.opacity = 1;
+
+        tooltip.transition().duration(200).style("visibility", "hidden");
+      });
   }, [data]);
-  return <svg ref={chartRef} className="w-[90vw] h-[80vh]"></svg>;
+  return <svg ref={chartRef} className="w-[98vw] h-[80vh]"></svg>;
 }
 
 Chart.propTypes = {
